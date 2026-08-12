@@ -16,11 +16,10 @@ export const POST: RequestHandler = async (event) => {
   if (!Number.isFinite(ln) || ln < -180 || ln > 180) throw error(400, 'Longitude tidak valid');
   if (!Number.isFinite(r) || r < 20 || r > 5000) throw error(400, 'Radius 20–5000 meter');
 
-  const sql = db();
-  const rows = await sql`
+  const rows = await db((sql) => sql`
     insert into locations (name, lat, lng, radius_m)
     values (${cleanName}, ${la}, ${ln}, ${r})
     returning id
-  `;
+  `);
   return json({ ok: true, id: Number(rows[0].id) });
 };

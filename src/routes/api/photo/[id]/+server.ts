@@ -12,10 +12,9 @@ export const GET: RequestHandler = async (event) => {
   if (!Number.isFinite(id)) throw error(400, 'ID tidak valid');
   const size = event.url.searchParams.get('size') === 'full' ? 'full' : 'thumb';
 
-  const sql = db();
-  const rows = await sql`
+  const rows = await db((sql) => sql`
     select user_id, photo_path, thumb_path from attendance where id = ${id} limit 1
-  `;
+  `);
   const row = rows[0];
   if (!row) throw error(404, 'Tidak ditemukan');
   // Employees may only view their own photos; admins may view all.

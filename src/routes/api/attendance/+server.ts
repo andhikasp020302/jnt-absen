@@ -24,12 +24,10 @@ export const POST: RequestHandler = async (event) => {
   if (!(photo instanceof File) || !(thumb instanceof File)) throw error(400, 'Foto wajib');
   if (photo.size > MAX_UPLOAD) throw error(413, 'Ukuran foto terlalu besar');
 
-  const sql = db();
-
   // Server-side geofence check — never trust the client.
-  const locs = (await sql`
-    select id, name, lat, lng, radius_m from locations where active = true
-  `) as unknown as GeoPoint[];
+  const locs = (await db(
+    (sql) => sql`select id, name, lat, lng, radius_m from locations where active = true`
+  )) as unknown as GeoPoint[];
 
   if (locs.length === 0) {
     throw error(409, 'Belum ada area absensi yang di-set admin. Hubungi admin.');
@@ -39,7 +37,7 @@ export const POST: RequestHandler = async (event) => {
     throw error(403, 'Anda berada di luar area absensi yang diizinkan.');
   }
 
-  // Upload compressed photo + thumbnail.
+  // Upload compressed photo + thumbnail (no DB connection held during upload).
   const { compact } = jakartaDate();
   const base = `${user.id}/${compact}/${Date.now()}_${type}`;
   const ct = ext === 'webp' ? 'image/webp' : 'image/jpeg';
@@ -49,11 +47,11 @@ export const POST: RequestHandler = async (event) => {
   await uploadObject(photoPath, await photo.arrayBuffer(), ct);
   await uploadObject(thumbPath, await thumb.arrayBuffer(), ct);
 
-  await sql`
+  await db((sql) => sql`
     insert into attendance (user_id, type, photo_path, thumb_path, lat, lng, location_id, distance_m)
     values (${user.id}, ${type}, ${photoPath}, ${thumbPath}, ${lat}, ${lng},
             ${match.point.id}, ${Math.round(match.distance)})
-  `;
+  `);
 
   return json({
     ok: true,

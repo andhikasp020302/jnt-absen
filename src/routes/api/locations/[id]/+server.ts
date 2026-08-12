@@ -8,8 +8,7 @@ export const PATCH: RequestHandler = async (event) => {
   const id = Number(event.params.id);
   if (!Number.isFinite(id)) throw error(400, 'ID tidak valid');
   const { active } = await event.request.json().catch(() => ({}));
-  const sql = db();
-  await sql`update locations set active = ${!!active} where id = ${id}`;
+  await db((sql) => sql`update locations set active = ${!!active} where id = ${id}`);
   return json({ ok: true });
 };
 
@@ -17,7 +16,6 @@ export const DELETE: RequestHandler = async (event) => {
   requireAdmin(event);
   const id = Number(event.params.id);
   if (!Number.isFinite(id)) throw error(400, 'ID tidak valid');
-  const sql = db();
-  await sql`delete from locations where id = ${id}`;
+  await db((sql) => sql`delete from locations where id = ${id}`);
   return json({ ok: true });
 };

@@ -6,7 +6,9 @@ const config = {
   preprocess: vitePreprocess(),
   kit: {
     // Node serverless runtime on Vercel (needed for the `postgres` driver).
-    adapter: adapter({ runtime: 'nodejs22.x' })
+    // Region sin1 (Singapore) supaya function sebelahan dengan database Supabase
+    // (region ap-southeast-1) → latency kecil, tidak menyeberang benua.
+    adapter: adapter({ runtime: 'nodejs22.x', regions: ['sin1'] })
   }
 };
 

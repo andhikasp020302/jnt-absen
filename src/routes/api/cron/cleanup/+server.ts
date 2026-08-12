@@ -15,17 +15,16 @@ export const GET: RequestHandler = async ({ request }) => {
   }
 
   const cutoff = addDays(jakartaDate().iso, -RETENTION_DAYS());
-  const sql = db();
   let removed = 0;
 
   // Process in batches to stay within serverless limits.
   for (let i = 0; i < 20; i++) {
-    const rows = await sql`
+    const rows = await db((sql) => sql`
       select id, photo_path, thumb_path
       from attendance
       where attendance_date < ${cutoff}
       limit 200
-    `;
+    `);
     if (rows.length === 0) break;
 
     const paths = rows.flatMap((r) => [r.photo_path, r.thumb_path].filter(Boolean) as string[]);
@@ -35,7 +34,7 @@ export const GET: RequestHandler = async ({ request }) => {
       // Continue even if some objects are already gone.
     }
     const ids = rows.map((r) => Number(r.id));
-    await sql`delete from attendance where id = any(${ids})`;
+    await db((sql) => sql`delete from attendance where id = any(${ids})`);
     removed += rows.length;
     if (rows.length < 200) break;
   }

@@ -39,8 +39,7 @@ export const load: PageServerLoad = async ({ url }) => {
   const page = Math.max(1, Number(url.searchParams.get('page') || '1'));
   const { from, to, label } = resolveRange(scope, month);
 
-  const sql = db();
-  const rows = await sql`
+  const rows = await db((sql) => sql`
     select a.id, a.type, a.distance_m,
            u.name as karyawan,
            to_char(a.created_at at time zone 'Asia/Jakarta', 'DD Mon') as tanggal,
@@ -52,7 +51,7 @@ export const load: PageServerLoad = async ({ url }) => {
     where a.attendance_date between ${from} and ${to}
     order by a.created_at desc
     limit ${PER_PAGE + 1} offset ${(page - 1) * PER_PAGE}
-  `;
+  `);
   const hasNext = rows.length > PER_PAGE;
 
   // Month options for the picker (last 3 months).

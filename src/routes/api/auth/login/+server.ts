@@ -8,11 +8,10 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
   const cleanName = String(name ?? '').trim();
   if (!cleanName || !password) throw error(400, 'Nama dan password wajib diisi');
 
-  const sql = db();
-  const rows = await sql`
+  const rows = await db((sql) => sql`
     select id, name, role, status, password_hash
     from users where lower(username) = lower(${cleanName}) limit 1
-  `;
+  `);
   const user = rows[0];
 
   // Uniform message to avoid leaking which names exist.
