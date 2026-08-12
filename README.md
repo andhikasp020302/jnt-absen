@@ -69,3 +69,5 @@ npm install
 cp .env.example .env    # isi kredensial Supabase
 npm run dev
 ```
+
+<!-- auto-deploy test 21:19:49 -->
