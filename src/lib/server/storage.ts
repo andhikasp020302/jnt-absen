@@ -5,8 +5,10 @@ import { SUPABASE_URL, SUPABASE_SERVICE_KEY, STORAGE_BUCKET } from './env';
 // admins view photos through short-lived signed URLs.
 
 function headers(extra: Record<string, string> = {}) {
+  const key = SUPABASE_SERVICE_KEY();
   return {
-    Authorization: `Bearer ${SUPABASE_SERVICE_KEY()}`,
+    Authorization: `Bearer ${key}`,
+    apikey: key,
     ...extra
   };
 }
