@@ -279,7 +279,7 @@ select {
    karyawan & admin. Halaman login/register tetap kartu tengah.
    ============================================================ */
 @media (min-width: 880px) {
-  .app:has(.tabbar) {
+  .app.has-nav {
     max-width: 1120px;
     display: grid;
     grid-template-columns: 240px 1fr;
@@ -289,15 +289,15 @@ select {
     align-items: start;
     box-shadow: 0 0 0 1px var(--line);
   }
-  .app:has(.tabbar) .topbar {
+  .app.has-nav .topbar {
     grid-area: top;
     padding: 16px 24px;
   }
-  .app:has(.tabbar) main {
+  .app.has-nav main {
     grid-area: main;
     min-height: calc(100dvh - 62px);
   }
-  .app:has(.tabbar) .tabbar {
+  .app.has-nav .tabbar {
     grid-area: nav;
     position: sticky;
     top: 62px;
@@ -311,7 +311,7 @@ select {
     min-height: calc(100dvh - 62px);
     background: var(--green-tint);
   }
-  .app:has(.tabbar) .tabbar a {
+  .app.has-nav .tabbar a {
     flex-direction: row;
     justify-content: flex-start;
     gap: 12px;
@@ -319,30 +319,30 @@ select {
     font-size: 14px;
     border-radius: 10px;
   }
-  .app:has(.tabbar) .tabbar a.active {
+  .app.has-nav .tabbar a.active {
     background: var(--green-light);
   }
-  .app:has(.tabbar) .tabbar svg {
+  .app.has-nav .tabbar svg {
     width: 20px;
     height: 20px;
   }
   /* Badge jumlah pending: pindah ke ujung kanan item (bukan mengambang) */
-  .app:has(.tabbar) .tabbar .dot {
+  .app.has-nav .tabbar .dot {
     position: static;
     margin-left: auto;
   }
   /* Konten memakai lebar area kanan (tabel butuh ruang) */
-  .app:has(.tabbar) main > .pad {
+  .app.has-nav main > .pad {
     max-width: none;
     padding: 26px 32px;
   }
   /* Halaman karyawan: kolom terpusat, tidak melebar kosong */
-  .app:has(.tabbar) .emp-main > .pad {
+  .app.has-nav .emp-main > .pad {
     max-width: 620px;
     margin: 0 auto;
   }
   /* Peta lokasi lebih tinggi di desktop */
-  .app:has(.tabbar) .map {
+  .app.has-nav .map {
     height: 460px;
   }
 }

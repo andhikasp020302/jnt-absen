@@ -3,7 +3,7 @@ import { db } from '$lib/server/db';
 
 export const load: PageServerLoad = async () => {
   const locations = await db((sql) => sql`
-    select id, name, lat, lng, radius_m, active
+    select id, name, lat, lng, active, polygon
     from locations order by created_at desc
   `);
   return { locations };

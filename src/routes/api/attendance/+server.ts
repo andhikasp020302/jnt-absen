@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db';
 import { requireUser } from '$lib/server/guard';
 import { uploadObject } from '$lib/server/storage';
-import { matchGeofence, type GeoPoint } from '$lib/server/geo';
+import { matchArea, type GeoArea } from '$lib/server/geo';
 import { jakartaDate } from '$lib/server/date';
 
 const MAX_UPLOAD = 1.5 * 1024 * 1024; // hard cap; client already compresses
@@ -24,15 +24,21 @@ export const POST: RequestHandler = async (event) => {
   if (!(photo instanceof File) || !(thumb instanceof File)) throw error(400, 'Foto wajib');
   if (photo.size > MAX_UPLOAD) throw error(413, 'Ukuran foto terlalu besar');
 
-  // Server-side geofence check — never trust the client.
+  // Server-side geofence check (poligon) — never trust the client.
   const locs = (await db(
-    (sql) => sql`select id, name, lat, lng, radius_m from locations where active = true`
-  )) as unknown as GeoPoint[];
+    (sql) =>
+      sql`select id, name, polygon from locations where active = true and polygon is not null`
+  )) as unknown as { id: number; name: string; polygon: unknown }[];
 
   if (locs.length === 0) {
     throw error(409, 'Belum ada area absensi yang di-set admin. Hubungi admin.');
   }
-  const match = matchGeofence(lat, lng, locs);
+  const areas: GeoArea[] = locs.map((l) => ({
+    id: Number(l.id),
+    name: l.name,
+    polygon: l.polygon as GeoArea['polygon']
+  }));
+  const match = matchArea(lat, lng, areas);
   if (!match) {
     throw error(403, 'Anda berada di luar area absensi yang diizinkan.');
   }
@@ -50,13 +56,13 @@ export const POST: RequestHandler = async (event) => {
   await db((sql) => sql`
     insert into attendance (user_id, type, photo_path, thumb_path, lat, lng, location_id, distance_m)
     values (${user.id}, ${type}, ${photoPath}, ${thumbPath}, ${lat}, ${lng},
-            ${match.point.id}, ${Math.round(match.distance)})
+            ${match.area.id}, ${Math.round(match.distance)})
   `);
 
   return json({
     ok: true,
     type,
-    location: match.point.name,
+    location: match.area.name,
     distance: Math.round(match.distance)
   });
 };

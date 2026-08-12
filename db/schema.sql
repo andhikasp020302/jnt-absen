@@ -15,13 +15,16 @@ create table if not exists users (
 );
 create index if not exists idx_users_status on users(status);
 
--- Titik geofence (area boleh absen) yang di-set admin
+-- Area geofence (poligon 4 titik) yang di-set admin.
+-- lat/lng menyimpan titik pusat (centroid) untuk keperluan peta.
+-- polygon menyimpan array sudut area: [{"lat":..,"lng":..}, x4].
 create table if not exists locations (
   id         bigint generated always as identity primary key,
   name       text             not null,
-  lat        double precision not null,
-  lng        double precision not null,
-  radius_m   integer          not null default 100,
+  lat        double precision,
+  lng        double precision,
+  radius_m   integer,
+  polygon    jsonb,
   active     boolean          not null default true,
   created_at timestamptz      not null default now()
 );
