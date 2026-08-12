@@ -24,7 +24,7 @@
   </button>
 </div>
 
-<main>{@render children()}</main>
+<main class="emp-main">{@render children()}</main>
 
 <nav class="tabbar">
   <a href="/absen" class:active={path === '/absen'}>

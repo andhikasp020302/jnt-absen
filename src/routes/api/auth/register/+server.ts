@@ -8,6 +8,9 @@ export const POST: RequestHandler = async ({ request }) => {
   const cleanName = String(name ?? '').trim();
 
   if (cleanName.length < 2) throw error(400, 'Nama minimal 2 karakter');
+  if (!/^[a-zA-Z0-9]+$/.test(cleanName)) {
+    throw error(400, 'Nama hanya boleh huruf dan angka (tanpa spasi/simbol)');
+  }
   if (String(password ?? '').length < 6) throw error(400, 'Password minimal 6 karakter');
 
   await db(async (sql) => {

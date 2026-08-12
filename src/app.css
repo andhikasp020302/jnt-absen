@@ -331,13 +331,113 @@ select {
     position: static;
     margin-left: auto;
   }
-  /* Konten diberi lebar nyaman untuk layar besar */
+  /* Konten memakai lebar area kanan (tabel butuh ruang) */
   .app:has(.tabbar) main > .pad {
-    max-width: 900px;
-    padding: 24px 28px;
+    max-width: none;
+    padding: 26px 32px;
+  }
+  /* Halaman karyawan: kolom terpusat, tidak melebar kosong */
+  .app:has(.tabbar) .emp-main > .pad {
+    max-width: 620px;
+    margin: 0 auto;
   }
   /* Peta lokasi lebih tinggi di desktop */
   .app:has(.tabbar) .map {
-    height: 420px;
+    height: 460px;
   }
+}
+
+/* ---- Toggle markup mobile vs desktop (mobile TIDAK berubah) ---- */
+.only-desktop {
+  display: none;
+}
+@media (min-width: 880px) {
+  .only-mobile {
+    display: none !important;
+  }
+  .only-desktop {
+    display: block;
+  }
+}
+
+/* ---- Komponen khusus desktop (hanya dipakai di dalam .only-desktop) ---- */
+.page-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.page-head h2 {
+  font-size: 22px;
+  margin: 0;
+}
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+.stat-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+.stat-card .num {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--green-dark);
+  line-height: 1.1;
+}
+.stat-card .lbl {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.dtable {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.dtable th {
+  text-align: left;
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+  padding: 12px 14px;
+  background: var(--green-tint);
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+.dtable td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+  vertical-align: middle;
+}
+.dtable tr:last-child td {
+  border-bottom: 0;
+}
+.dtable tbody tr:hover {
+  background: var(--green-tint);
+}
+.dtable .thumb-sm {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+  display: block;
+  border: 0;
+  background: var(--green-light);
+  cursor: pointer;
+  padding: 0;
+}
+.dtable-wrap {
+  overflow-x: auto;
+  border-radius: 14px;
 }

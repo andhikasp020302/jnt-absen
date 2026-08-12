@@ -43,7 +43,7 @@
   const others = $derived(data.users.filter((u) => u.status !== 'pending'));
 </script>
 
-<div class="pad">
+<div class="pad only-mobile">
   <h2 style="font-size:17px;margin-bottom:6px">Karyawan</h2>
 
   {#if pending.length > 0}
@@ -101,7 +101,81 @@
   {/if}
 </div>
 
+<!-- ===================== DESKTOP ===================== -->
+<div class="pad only-desktop">
+  <div class="page-head">
+    <h2>Karyawan</h2>
+    <span class="muted">{others.length} karyawan · {pending.length} menunggu</span>
+  </div>
+
+  {#if pending.length > 0}
+    <div class="pending-head">⏳ Menunggu persetujuan ({pending.length})</div>
+    <div class="dtable-wrap" style="margin-bottom:22px">
+      <table class="dtable">
+        <thead><tr><th>Nama</th><th>Tanggal daftar</th><th>Aksi</th></tr></thead>
+        <tbody>
+          {#each pending as u (u.id)}
+            <tr>
+              <td><b>{u.name}</b></td>
+              <td>{u.tanggal}</td>
+              <td>
+                <div class="rowacts">
+                  <button class="mini ok" disabled={busy === u.id} onclick={() => act(u.id, 'approve')}>Setujui</button>
+                  <button class="mini no" disabled={busy === u.id} onclick={() => act(u.id, 'reject')}>Tolak</button>
+                </div>
+              </td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    </div>
+  {/if}
+
+  <div class="dtable-wrap">
+    <table class="dtable">
+      <thead><tr><th>Nama</th><th>Status</th><th>Tanggal daftar</th><th>Aksi</th></tr></thead>
+      <tbody>
+        {#if others.length === 0}
+          <tr><td colspan="4" class="center muted" style="padding:24px">Belum ada karyawan.</td></tr>
+        {/if}
+        {#each others as u (u.id)}
+          <tr>
+            <td><b>{u.name}</b></td>
+            <td>
+              <span class="badge {u.status === 'approved' ? 'approved' : 'rejected'}">
+                {u.status === 'approved' ? 'Aktif' : 'Nonaktif'}
+              </span>
+            </td>
+            <td>{u.tanggal}</td>
+            <td>
+              <div class="rowacts">
+                <button class="mini pw" disabled={busy === u.id} onclick={() => changePassword(u.id, u.name)}>Ganti Password</button>
+                {#if u.status === 'approved'}
+                  <button class="mini no" disabled={busy === u.id} onclick={() => act(u.id, 'deactivate')}>Nonaktifkan</button>
+                {:else}
+                  <button class="mini ok" disabled={busy === u.id} onclick={() => act(u.id, 'activate')}>Aktifkan</button>
+                {/if}
+                <button class="mini del" disabled={busy === u.id} onclick={() => remove(u.id, u.name)}>Hapus</button>
+              </div>
+            </td>
+          </tr>
+        {/each}
+      </tbody>
+    </table>
+  </div>
+</div>
+
 <style>
+  .pending-head {
+    font-weight: 600;
+    color: var(--warn);
+    margin-bottom: 8px;
+  }
+  .rowacts {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
   .sm {
     font-size: 12px;
   }

@@ -180,6 +180,8 @@
     Ketuk peta untuk memilih titik. Karyawan hanya bisa absen di dalam radius area aktif.
   </p>
 
+  <div class="lok-grid">
+    <div class="lok-left">
   <div class="search">
     <input
       placeholder="🔍 Cari tempat / alamat (mis: JNT Bogor, Jl. ...)"
@@ -197,7 +199,9 @@
   </div>
 
   <div bind:this={mapEl} class="map"></div>
+    </div>
 
+    <div class="lok-right">
   <div class="card pad" style="margin-top:14px">
     {#if err}<div class="alert err">{err}</div>{/if}
     <div class="field">
@@ -251,6 +255,8 @@
       {/each}
     </div>
   {/if}
+    </div>
+  </div>
 </div>
 
 <style>
@@ -259,6 +265,17 @@
     border-radius: var(--radius);
     overflow: hidden;
     border: 1px solid var(--line);
+  }
+  @media (min-width: 880px) {
+    .lok-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 22px;
+      align-items: start;
+    }
+    .lok-right :global(.card) {
+      margin-top: 0 !important;
+    }
   }
   .search {
     position: relative;

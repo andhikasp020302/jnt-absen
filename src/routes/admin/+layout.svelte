@@ -7,6 +7,25 @@
     await fetch('/api/auth/logout', { method: 'POST' });
     await goto('/login');
   }
+
+  async function changeMyPassword() {
+    const current = prompt('Password lama:');
+    if (current === null) return;
+    const next = prompt('Password baru (min. 6 karakter):');
+    if (next === null) return;
+    if (next.length < 6) {
+      alert('Password baru minimal 6 karakter.');
+      return;
+    }
+    const res = await fetch('/api/auth/change-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ current, next })
+    });
+    const d = await res.json().catch(() => ({}));
+    alert(res.ok ? 'Password berhasil diganti.' : d.message || 'Gagal mengganti password.');
+  }
+
   const path = $derived($page.url.pathname);
 </script>
 
@@ -16,7 +35,12 @@
     <h1>Admin · BGR031A</h1>
     <div class="sub">{data.user?.name}</div>
   </div>
-  <button class="out" onclick={logout} aria-label="Keluar">
+  <button class="out" onclick={changeMyPassword} aria-label="Ganti password" title="Ganti password">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+      <path d="M12 15v2m-6 4h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2zM16 11V7a4 4 0 0 0-8 0v4" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+  <button class="out" onclick={logout} aria-label="Keluar" title="Keluar">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>

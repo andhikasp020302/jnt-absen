@@ -1,19 +1,21 @@
 <script lang="ts">
+  import PasswordField from '$lib/PasswordField.svelte';
+
   let name = $state('');
   let password = $state('');
-  let password2 = $state('');
   let err = $state('');
   let ok = $state('');
   let loading = $state(false);
+
+  // Hanya huruf & angka (tanpa spasi/simbol).
+  function onName(e: Event) {
+    name = (e.target as HTMLInputElement).value.replace(/[^a-zA-Z0-9]/g, '');
+  }
 
   async function submit(e: SubmitEvent) {
     e.preventDefault();
     err = '';
     ok = '';
-    if (password !== password2) {
-      err = 'Konfirmasi password tidak sama';
-      return;
-    }
     loading = true;
     try {
       const res = await fetch('/api/auth/register', {
@@ -29,7 +31,6 @@
       ok = data.message;
       name = '';
       password = '';
-      password2 = '';
     } catch {
       err = 'Tidak ada koneksi. Coba lagi.';
     } finally {
@@ -50,15 +51,19 @@
     {#if ok}<div class="alert ok">{ok}</div>{/if}
     <div class="field">
       <label for="name">Nama</label>
-      <input id="name" bind:value={name} autocomplete="username" required placeholder="Nama lengkap" />
+      <input
+        id="name"
+        value={name}
+        oninput={onName}
+        autocomplete="username"
+        required
+        placeholder="Nama (huruf & angka)"
+      />
+      <p class="hint">Tanpa spasi atau simbol — hanya huruf dan angka.</p>
     </div>
     <div class="field">
       <label for="pw">Password</label>
-      <input id="pw" type="password" bind:value={password} required placeholder="Minimal 6 karakter" />
-    </div>
-    <div class="field">
-      <label for="pw2">Ulangi Password</label>
-      <input id="pw2" type="password" bind:value={password2} required placeholder="Ulangi password" />
+      <PasswordField id="pw" bind:value={password} autocomplete="new-password" placeholder="Minimal 6 karakter" />
     </div>
     <button class="btn" disabled={loading}>
       {#if loading}<span class="spin"></span>{:else}Daftar{/if}
@@ -76,6 +81,8 @@
 <style>
   .auth {
     padding-top: calc(48px + var(--safe-top));
+    max-width: 480px;
+    margin: 0 auto;
   }
   .brand {
     text-align: center;
@@ -98,5 +105,10 @@
   }
   .brand h1 {
     font-size: 20px;
+  }
+  .hint {
+    font-size: 11px;
+    color: var(--muted);
+    margin: 6px 0 0;
   }
 </style>

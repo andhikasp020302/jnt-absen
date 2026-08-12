@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import PasswordField from '$lib/PasswordField.svelte';
 
   let name = $state('');
   let password = $state('');
@@ -41,11 +42,11 @@
     {#if err}<div class="alert err">{err}</div>{/if}
     <div class="field">
       <label for="name">Nama</label>
-      <input id="name" bind:value={name} autocomplete="username" required placeholder="Nama lengkap" />
+      <input id="name" bind:value={name} autocomplete="username" required placeholder="Nama" />
     </div>
     <div class="field">
       <label for="pw">Password</label>
-      <input id="pw" type="password" bind:value={password} autocomplete="current-password" required placeholder="••••••" />
+      <PasswordField id="pw" bind:value={password} autocomplete="current-password" />
     </div>
     <button class="btn" disabled={loading}>
       {#if loading}<span class="spin"></span>{:else}Masuk{/if}
@@ -60,6 +61,8 @@
 <style>
   .auth {
     padding-top: calc(48px + var(--safe-top));
+    max-width: 480px;
+    margin: 0 auto;
   }
   .brand {
     text-align: center;

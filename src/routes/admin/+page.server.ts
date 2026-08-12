@@ -54,8 +54,20 @@ export const load: PageServerLoad = async ({ url }) => {
   `);
   const hasNext = rows.length > PER_PAGE;
 
+  // Ringkasan periode (untuk kartu statistik di tampilan desktop).
+  const sum = await db((sql) => sql`
+    select
+      count(*)::int as total,
+      count(*) filter (where type = 'in')::int as masuk,
+      count(*) filter (where type = 'out')::int as pulang,
+      count(distinct user_id)::int as karyawan
+    from attendance
+    where attendance_date between ${from} and ${to}
+  `);
+  const summary = sum[0] as { total: number; masuk: number; pulang: number; karyawan: number };
+
   // Month options for the picker (last 3 months).
   const months = [monthStart(0), monthStart(1), monthStart(2)].map((m) => m.slice(0, 7));
 
-  return { rows: rows.slice(0, PER_PAGE), page, hasNext, scope, month, label, months };
+  return { rows: rows.slice(0, PER_PAGE), page, hasNext, scope, month, label, months, summary };
 };
