@@ -1,0 +1,64 @@
+import { json, error } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
+import { db } from '$lib/server/db';
+import { requireUser } from '$lib/server/guard';
+import { uploadObject } from '$lib/server/storage';
+import { matchGeofence, type GeoPoint } from '$lib/server/geo';
+import { jakartaDate } from '$lib/server/date';
+
+const MAX_UPLOAD = 1.5 * 1024 * 1024; // hard cap; client already compresses
+
+export const POST: RequestHandler = async (event) => {
+  const user = requireUser(event);
+  const form = await event.request.formData();
+
+  const type = String(form.get('type') ?? '');
+  const lat = Number(form.get('lat'));
+  const lng = Number(form.get('lng'));
+  const photo = form.get('photo');
+  const thumb = form.get('thumb');
+  const ext = String(form.get('ext') ?? 'webp').replace(/[^a-z]/g, '') || 'webp';
+
+  if (type !== 'in' && type !== 'out') throw error(400, 'Tipe absen tidak valid');
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) throw error(400, 'Lokasi GPS tidak terbaca');
+  if (!(photo instanceof File) || !(thumb instanceof File)) throw error(400, 'Foto wajib');
+  if (photo.size > MAX_UPLOAD) throw error(413, 'Ukuran foto terlalu besar');
+
+  const sql = db();
+
+  // Server-side geofence check — never trust the client.
+  const locs = (await sql`
+    select id, name, lat, lng, radius_m from locations where active = true
+  `) as unknown as GeoPoint[];
+
+  if (locs.length === 0) {
+    throw error(409, 'Belum ada area absensi yang di-set admin. Hubungi admin.');
+  }
+  const match = matchGeofence(lat, lng, locs);
+  if (!match) {
+    throw error(403, 'Anda berada di luar area absensi yang diizinkan.');
+  }
+
+  // Upload compressed photo + thumbnail.
+  const { compact } = jakartaDate();
+  const base = `${user.id}/${compact}/${Date.now()}_${type}`;
+  const ct = ext === 'webp' ? 'image/webp' : 'image/jpeg';
+  const photoPath = `${base}.${ext}`;
+  const thumbPath = `${base}_t.${ext}`;
+
+  await uploadObject(photoPath, await photo.arrayBuffer(), ct);
+  await uploadObject(thumbPath, await thumb.arrayBuffer(), ct);
+
+  await sql`
+    insert into attendance (user_id, type, photo_path, thumb_path, lat, lng, location_id, distance_m)
+    values (${user.id}, ${type}, ${photoPath}, ${thumbPath}, ${lat}, ${lng},
+            ${match.point.id}, ${Math.round(match.distance)})
+  `;
+
+  return json({
+    ok: true,
+    type,
+    location: match.point.name,
+    distance: Math.round(match.distance)
+  });
+};
