@@ -74,12 +74,13 @@ select {
   position: sticky;
   top: 0;
   z-index: 20;
-  background: var(--green);
+  background: linear-gradient(135deg, #12a24a, var(--green-dark));
   color: #fff;
   padding: calc(12px + var(--safe-top)) 16px 12px;
   display: flex;
   align-items: center;
   gap: 10px;
+  box-shadow: 0 2px 12px rgba(10, 143, 60, 0.18);
 }
 .topbar h1 {
   font-size: 17px;
@@ -99,16 +100,21 @@ select {
   gap: 8px;
   border: 0;
   border-radius: var(--radius);
-  background: var(--green);
+  background: linear-gradient(180deg, #17a94a, var(--green));
   color: #fff;
   padding: 14px 18px;
   font-weight: 600;
   width: 100%;
-  transition: background 0.12s;
+  transition: transform 0.1s, box-shadow 0.15s, filter 0.15s;
   min-height: 50px;
+  box-shadow: 0 8px 18px rgba(10, 143, 60, 0.22);
+}
+.btn:hover {
+  filter: brightness(1.03);
 }
 .btn:active {
-  background: var(--green-dark);
+  transform: translateY(1px);
+  box-shadow: 0 4px 10px rgba(10, 143, 60, 0.2);
 }
 .btn:disabled {
   opacity: 0.55;
@@ -139,15 +145,17 @@ select {
 .field input,
 .field select {
   width: 100%;
-  padding: 13px 14px;
+  padding: 14px 15px;
   border: 1px solid var(--line);
   border-radius: 12px;
   background: var(--white);
   outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 .field input:focus,
 .field select:focus {
   border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(10, 143, 60, 0.13);
 }
 
 .card {
@@ -278,38 +286,43 @@ select {
    Hanya berlaku untuk halaman ber-navigasi (punya .tabbar):
    karyawan & admin. Halaman login/register tetap kartu tengah.
    ============================================================ */
-@media (min-width: 880px) {
+@media (min-width: 768px) {
+  /* App-shell full-screen: topbar penuh di atas, sidebar + konten di bawahnya.
+     Memakai grid rows auto/1fr → sidebar SELALU sejajar tepat di bawah topbar
+     (tanpa angka ajaib), dan hanya area konten yang scroll. */
   .app.has-nav {
-    max-width: 1120px;
+    max-width: none;
+    width: 100%;
+    height: 100dvh;
     display: grid;
-    grid-template-columns: 240px 1fr;
+    grid-template-columns: 250px 1fr;
+    grid-template-rows: auto 1fr;
     grid-template-areas:
       'top top'
       'nav main';
-    align-items: start;
-    box-shadow: 0 0 0 1px var(--line);
+    overflow: hidden;
   }
   .app.has-nav .topbar {
     grid-area: top;
-    padding: 16px 24px;
+    position: static;
+    padding: 15px 28px;
   }
   .app.has-nav main {
     grid-area: main;
-    min-height: calc(100dvh - 62px);
+    overflow-y: auto;
   }
   .app.has-nav .tabbar {
     grid-area: nav;
-    position: sticky;
-    top: 62px;
-    align-self: start;
+    position: static;
     flex-direction: column;
     justify-content: flex-start;
     gap: 4px;
-    padding: 16px 12px;
+    padding: 18px 12px;
     border-top: 0;
     border-right: 1px solid var(--line);
-    min-height: calc(100dvh - 62px);
-    background: var(--green-tint);
+    background: linear-gradient(180deg, var(--green-tint), #fff);
+    overflow-y: auto;
+    padding-bottom: 24px;
   }
   .app.has-nav .tabbar a {
     flex-direction: row;
@@ -317,33 +330,32 @@ select {
     gap: 12px;
     padding: 12px 16px;
     font-size: 14px;
-    border-radius: 10px;
+    border-radius: 12px;
   }
   .app.has-nav .tabbar a.active {
-    background: var(--green-light);
+    background: var(--green);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(10, 143, 60, 0.28);
   }
   .app.has-nav .tabbar svg {
     width: 20px;
     height: 20px;
   }
-  /* Badge jumlah pending: pindah ke ujung kanan item (bukan mengambang) */
   .app.has-nav .tabbar .dot {
     position: static;
     margin-left: auto;
   }
-  /* Konten memakai lebar area kanan (tabel butuh ruang) */
+  /* Konten: lebar nyaman, rata kiri (tidak melebar berlebihan di layar besar) */
   .app.has-nav main > .pad {
-    max-width: none;
-    padding: 26px 32px;
+    max-width: 1400px;
+    padding: 30px 36px;
   }
-  /* Halaman karyawan: kolom terpusat, tidak melebar kosong */
   .app.has-nav .emp-main > .pad {
-    max-width: 620px;
+    max-width: 640px;
     margin: 0 auto;
   }
-  /* Peta lokasi lebih tinggi di desktop */
   .app.has-nav .map {
-    height: 460px;
+    height: 440px;
   }
 }
 

@@ -80,31 +80,38 @@
 
 <style>
   .auth {
-    padding-top: calc(48px + var(--safe-top));
-    max-width: 480px;
+    padding: calc(46px + var(--safe-top)) 12px 30px;
+    max-width: 470px;
     margin: 0 auto;
+    min-height: 100dvh;
+    background: radial-gradient(120% 55% at 50% 0%, var(--green-light), transparent 65%);
   }
   .brand {
     text-align: center;
     margin-bottom: 22px;
   }
   .logo {
-    width: 72px;
-    height: 72px;
-    margin: 0 auto 14px;
-    border-radius: 20px;
-    background: var(--green);
+    width: 78px;
+    height: 78px;
+    margin: 0 auto 16px;
+    border-radius: 22px;
+    background: linear-gradient(145deg, #1cc25a, var(--green-dark));
     color: #fff;
     font-weight: 800;
-    font-size: 26px;
+    font-size: 27px;
     letter-spacing: 1px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: var(--shadow);
+    box-shadow: 0 14px 28px rgba(10, 143, 60, 0.35);
   }
   .brand h1 {
-    font-size: 20px;
+    font-size: 22px;
+  }
+  .auth :global(form.card) {
+    padding: 22px 18px;
+    border-radius: 20px;
+    box-shadow: 0 14px 34px rgba(16, 36, 27, 0.1);
   }
   .hint {
     font-size: 11px;
