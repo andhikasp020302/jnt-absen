@@ -272,3 +272,72 @@ select {
     transform: rotate(360deg);
   }
 }
+
+/* ============================================================
+   DESKTOP VIEW (laptop/PC). Mobile TIDAK diubah.
+   Hanya berlaku untuk halaman ber-navigasi (punya .tabbar):
+   karyawan & admin. Halaman login/register tetap kartu tengah.
+   ============================================================ */
+@media (min-width: 880px) {
+  .app:has(.tabbar) {
+    max-width: 1120px;
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    grid-template-areas:
+      'top top'
+      'nav main';
+    align-items: start;
+    box-shadow: 0 0 0 1px var(--line);
+  }
+  .app:has(.tabbar) .topbar {
+    grid-area: top;
+    padding: 16px 24px;
+  }
+  .app:has(.tabbar) main {
+    grid-area: main;
+    min-height: calc(100dvh - 62px);
+  }
+  .app:has(.tabbar) .tabbar {
+    grid-area: nav;
+    position: sticky;
+    top: 62px;
+    align-self: start;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 4px;
+    padding: 16px 12px;
+    border-top: 0;
+    border-right: 1px solid var(--line);
+    min-height: calc(100dvh - 62px);
+    background: var(--green-tint);
+  }
+  .app:has(.tabbar) .tabbar a {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    font-size: 14px;
+    border-radius: 10px;
+  }
+  .app:has(.tabbar) .tabbar a.active {
+    background: var(--green-light);
+  }
+  .app:has(.tabbar) .tabbar svg {
+    width: 20px;
+    height: 20px;
+  }
+  /* Badge jumlah pending: pindah ke ujung kanan item (bukan mengambang) */
+  .app:has(.tabbar) .tabbar .dot {
+    position: static;
+    margin-left: auto;
+  }
+  /* Konten diberi lebar nyaman untuk layar besar */
+  .app:has(.tabbar) main > .pad {
+    max-width: 900px;
+    padding: 24px 28px;
+  }
+  /* Peta lokasi lebih tinggi di desktop */
+  .app:has(.tabbar) .map {
+    height: 420px;
+  }
+}

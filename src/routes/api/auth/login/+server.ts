@@ -20,7 +20,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     throw error(401, 'Nama atau password salah');
   }
   if (user.status === 'pending') throw error(403, 'Akun belum disetujui admin');
-  if (user.status === 'rejected') throw error(403, 'Pendaftaran ditolak admin');
+  if (user.status === 'rejected') throw error(403, 'Akun tidak aktif. Hubungi admin.');
 
   const session = { id: Number(user.id), name: user.name, role: user.role };
   cookies.set(SESSION_COOKIE, signSession(session), cookieOptions);

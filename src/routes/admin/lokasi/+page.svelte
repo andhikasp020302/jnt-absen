@@ -21,8 +21,40 @@
   let saving = $state(false);
   let busy = $state<number | null>(null);
 
-  // Default center: Bogor (cabang BGR031A).
-  const DEFAULT: [number, number] = [-6.5971, 106.806];
+  // Default: tampilkan seluruh Indonesia agar admin bisa mencari & zoom sendiri.
+  const DEFAULT: [number, number] = [-2.5, 118];
+  const DEFAULT_ZOOM = 5;
+
+  // Pencarian tempat (Nominatim via /api/geocode).
+  let search = $state('');
+  let results = $state<{ name: string; lat: number; lng: number }[]>([]);
+  let searching = $state(false);
+  let searchTimer: ReturnType<typeof setTimeout> | undefined;
+
+  function onSearchInput() {
+    clearTimeout(searchTimer);
+    if (search.trim().length < 3) {
+      results = [];
+      return;
+    }
+    searchTimer = setTimeout(doSearch, 400);
+  }
+  async function doSearch() {
+    searching = true;
+    try {
+      const res = await fetch('/api/geocode?q=' + encodeURIComponent(search.trim()));
+      const d = await res.json().catch(() => ({ results: [] }));
+      results = d.results || [];
+    } finally {
+      searching = false;
+    }
+  }
+  function chooseResult(r: { name: string; lat: number; lng: number }) {
+    results = [];
+    search = r.name.split(',')[0];
+    map?.setView([r.lat, r.lng], 17);
+    placePoint(r.lat, r.lng);
+  }
 
   function placePoint(la: number, ln: number) {
     lat = la.toFixed(6);
@@ -60,7 +92,7 @@
     L = (await import('leaflet')).default as unknown as typeof LType;
     const first = data.locations[0];
     const center: [number, number] = first ? [first.lat, first.lng] : DEFAULT;
-    map = L.map(mapEl, { zoomControl: true }).setView(center, 16);
+    map = L.map(mapEl, { zoomControl: true }).setView(center, first ? 16 : DEFAULT_ZOOM);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '© OpenStreetMap'
@@ -148,6 +180,22 @@
     Ketuk peta untuk memilih titik. Karyawan hanya bisa absen di dalam radius area aktif.
   </p>
 
+  <div class="search">
+    <input
+      placeholder="🔍 Cari tempat / alamat (mis: JNT Bogor, Jl. ...)"
+      bind:value={search}
+      oninput={onSearchInput}
+    />
+    {#if searching}<span class="spin dark"></span>{/if}
+    {#if results.length}
+      <ul class="results">
+        {#each results as r}
+          <li><button type="button" onclick={() => chooseResult(r)}>{r.name}</button></li>
+        {/each}
+      </ul>
+    {/if}
+  </div>
+
   <div bind:this={mapEl} class="map"></div>
 
   <div class="card pad" style="margin-top:14px">
@@ -211,6 +259,56 @@
     border-radius: var(--radius);
     overflow: hidden;
     border: 1px solid var(--line);
+  }
+  .search {
+    position: relative;
+    margin-bottom: 10px;
+  }
+  .search input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    outline: none;
+  }
+  .search input:focus {
+    border-color: var(--green);
+  }
+  .search .spin.dark {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    border-color: var(--line);
+    border-top-color: var(--green);
+  }
+  .results {
+    list-style: none;
+    margin: 6px 0 0;
+    padding: 6px;
+    position: absolute;
+    z-index: 500;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    max-height: 240px;
+    overflow-y: auto;
+  }
+  .results li button {
+    width: 100%;
+    text-align: left;
+    border: 0;
+    background: none;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.35;
+    color: var(--ink);
+  }
+  .results li button:active {
+    background: var(--green-light);
   }
   .sm {
     font-size: 12px;
