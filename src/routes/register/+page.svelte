@@ -80,11 +80,19 @@
 
 <style>
   .auth {
-    padding: calc(46px + var(--safe-top)) 12px 30px;
+    padding: calc(46px + var(--safe-top)) 10px 30px;
     max-width: 470px;
+    width: 100%;
     margin: 0 auto;
     min-height: 100dvh;
     background: radial-gradient(120% 55% at 50% 0%, var(--green-light), transparent 65%);
+  }
+  @media (min-width: 768px) {
+    .auth {
+      background: transparent;
+      min-height: auto;
+      padding-top: 6vh;
+    }
   }
   .brand {
     text-align: center;
@@ -109,7 +117,7 @@
     font-size: 22px;
   }
   .auth :global(form.card) {
-    padding: 22px 18px;
+    padding: 22px 15px;
     border-radius: 20px;
     box-shadow: 0 14px 34px rgba(16, 36, 27, 0.1);
   }

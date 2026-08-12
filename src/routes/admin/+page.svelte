@@ -13,6 +13,9 @@
   function pageHref(p: number) {
     return `?scope=${data.scope}${data.month ? `&month=${data.month}` : ''}&page=${p}`;
   }
+  const exportHref = $derived(
+    `/api/export?scope=${data.scope}${data.month ? `&month=${data.month}` : ''}`
+  );
 </script>
 
 <!-- ===================== MOBILE (tidak diubah) ===================== -->
@@ -30,6 +33,8 @@
   </div>
 
   <p class="muted sm" style="margin:12px 0 8px">Menampilkan: <b>{data.label}</b></p>
+
+  <a class="btn secondary dl" href={exportHref}>⬇ Unduh Excel ({data.label})</a>
 
   {#if data.rows.length === 0}
     <p class="muted center" style="margin-top:40px">Tidak ada data absensi pada periode ini.</p>
@@ -74,6 +79,7 @@
           <option value={m}>{m}</option>
         {/each}
       </select>
+      <a class="btn secondary dl-desk" href={exportHref}>⬇ Excel</a>
     </div>
   </div>
 
@@ -206,6 +212,16 @@
     font-weight: 600;
     color: var(--green-dark);
     background: var(--white);
+  }
+  .dl {
+    margin-bottom: 14px;
+  }
+  .dl-desk {
+    width: auto;
+    padding: 9px 16px;
+    min-height: 0;
+    white-space: nowrap;
+    box-shadow: none;
   }
   .lb {
     position: fixed;

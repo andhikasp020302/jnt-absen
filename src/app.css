@@ -360,6 +360,18 @@ select {
   }
 }
 
+/* Halaman tanpa navigasi (login/register) di desktop: full-screen gradasi,
+   tanpa kolom putih 480px, kartu form di tengah. */
+@media (min-width: 768px) {
+  .app:not(.has-nav) {
+    max-width: none;
+    width: 100%;
+    background: linear-gradient(165deg, var(--green-light) 0%, var(--green-tint) 55%, #fff 100%);
+    align-items: center;
+    justify-content: flex-start;
+  }
+}
+
 /* ---- Toggle markup mobile vs desktop (mobile TIDAK berubah) ---- */
 .only-desktop {
   display: none;
